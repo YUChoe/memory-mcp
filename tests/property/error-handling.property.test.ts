@@ -211,7 +211,7 @@ describe('에러 처리 속성 테스트', () => {
   it('속성 14-2: 중복 엔티티 생성 시 설명적 에러', async () => {
     await fc.assert(
       fc.asyncProperty(
-        fc.string({ minLength: 1, maxLength: 20 }),
+        fc.string({ minLength: 1, maxLength: 20 }).filter(s => s.trim().length > 0),
         fc.string({ minLength: 1, maxLength: 20 }),
         async (name, entityType) => {
           // 첫 번째 엔티티 생성

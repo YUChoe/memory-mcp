@@ -158,3 +158,83 @@ describe('Property 12: 영속성 라운드 트립', () => {
     }
   });
 });
+
+// ============================================================================
+// 속성 13: 데이터는 재시작 후에도 유지
+// **Validates: Requirements 5.1, 5.2**
+// ============================================================================
+
+describe('Property 13: 데이터는 재시작 후에도 유지', () => {
+  it('모든 그래프 수정 작업에 대해, 작업 수행 후 서버를 재시작하면 수정된 데이터가 유지되어야 함', async () => {
+    await fc.assert(
+      fc.asyncProperty(knowledgeGraphArb, async (initialGraph) => {
+        const testDir = await createTestDir();
+
+        try {
+          // 첫 번째 저장소 인스턴스로 초기 그래프 저장
+          const storage1 = new GraphStorage(testDir);
+          await storage1.save(initialGraph);
+
+          // 두 번째 저장소 인스턴스로 로드 (서버 재시작 시뮬레이션)
+          const storage2 = new GraphStorage(testDir);
+          const loaded = await storage2.load();
+
+          // 데이터가 동일한지 확인
+          expect(loaded.entities.size).toBe(initialGraph.entities.size);
+
+          for (const [name, entity] of initialGraph.entities) {
+            const loadedEntity = loaded.entities.get(name);
+            expect(loadedEntity).toBeDefined();
+            expect(loadedEntity?.name).toBe(entity.name);
+            expect(loadedEntity?.entityType).toBe(entity.entityType);
+            expect(loadedEntity?.observations).toEqual(entity.observations);
+          }
+
+          expect(loaded.relations.length).toBe(initialGraph.relations.length);
+
+          for (let i = 0; i < initialGraph.relations.length; i++) {
+            expect(loaded.relations[i]).toEqual(initialGraph.relations[i]);
+          }
+        } finally {
+          await cleanupTestDir(testDir);
+        }
+      }),
+      { numRuns: 100 }
+    );
+  });
+
+  it('여러 수정 작업 후 재시작해도 최종 상태가 유지되어야 함', async () => {
+    const testDir = await createTestDir();
+
+    try {
+      // 첫 번째 인스턴스: 초기 데이터 저장
+      const storage1 = new GraphStorage(testDir);
+      const graph1: KnowledgeGraph = {
+        entities: new Map([
+          ['Entity1', { name: 'Entity1', entityType: 'Type1', observations: ['obs1'] }],
+        ]),
+        relations: [],
+      };
+      await storage1.save(graph1);
+
+      // 두 번째 인스턴스: 데이터 수정
+      const storage2 = new GraphStorage(testDir);
+      const loaded1 = await storage2.load();
+      loaded1.entities.set('Entity2', { name: 'Entity2', entityType: 'Type2', observations: ['obs2'] });
+      loaded1.relations.push({ from: 'Entity1', to: 'Entity2', relationType: 'relates_to' });
+      await storage2.save(loaded1);
+
+      // 세 번째 인스턴스: 최종 상태 확인
+      const storage3 = new GraphStorage(testDir);
+      const loaded2 = await storage3.load();
+
+      expect(loaded2.entities.size).toBe(2);
+      expect(loaded2.entities.has('Entity1')).toBe(true);
+      expect(loaded2.entities.has('Entity2')).toBe(true);
+      expect(loaded2.relations.length).toBe(1);
+      expect(loaded2.relations[0]).toEqual({ from: 'Entity1', to: 'Entity2', relationType: 'relates_to' });
+    } finally {
+      await cleanupTestDir(testDir);
+    }
+  });
+});

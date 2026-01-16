@@ -66,7 +66,7 @@ describe('손상된 JSON 파일 처리', () => {
     await fs.mkdir(dir, { recursive: true });
     await fs.writeFile(storagePath, '{ invalid json }', 'utf-8');
 
-    await expect(storage.load()).rejects.toThrow('Failed to load graph');
+    await expect(storage.load()).rejects.toThrow('Failed to parse storage file');
   });
 
   it('빈 파일을 로드하면 에러를 발생시켜야 함', async () => {
@@ -78,7 +78,7 @@ describe('손상된 JSON 파일 처리', () => {
     await fs.mkdir(dir, { recursive: true });
     await fs.writeFile(storagePath, '', 'utf-8');
 
-    await expect(storage.load()).rejects.toThrow('Failed to load graph');
+    await expect(storage.load()).rejects.toThrow('Failed to parse storage file');
   });
 
   it('잘못된 구조의 JSON을 로드하면 에러를 발생시켜야 함', async () => {

@@ -129,8 +129,8 @@ export class KnowledgeGraphManager {
     if (notFound.length > 0) {
       return {
         success: false,
-        error: `Entities not found: ${JSON.stringify(notFound)}`,
-        errorKo: `다음 엔티티를 찾을 수 없습니다: ${JSON.stringify(notFound)}`,
+        error: `Entities not found: [${notFound.map(n => `"${n}"`).join(', ')}]`,
+        errorKo: `다음 엔티티를 찾을 수 없습니다: [${notFound.map(n => `"${n}"`).join(', ')}]`,
       };
     }
 
@@ -185,8 +185,8 @@ export class KnowledgeGraphManager {
         const uniqueMissing = [...new Set(missingEntities)];
         return {
           success: false,
-          error: `Entities not found: ${JSON.stringify(uniqueMissing)}`,
-          errorKo: `다음 엔티티를 찾을 수 없습니다: ${JSON.stringify(uniqueMissing)}`,
+          error: `Entities not found: [${uniqueMissing.map(n => `"${n}"`).join(', ')}]`,
+          errorKo: `다음 엔티티를 찾을 수 없습니다: [${uniqueMissing.map(n => `"${n}"`).join(', ')}]`,
         };
       }
 
@@ -254,8 +254,8 @@ export class KnowledgeGraphManager {
         const uniqueMissing = [...new Set(missingEntities)];
         return {
           success: false,
-          error: `Entities not found: ${JSON.stringify(uniqueMissing)}`,
-          errorKo: `다음 엔티티를 찾을 수 없습니다: ${JSON.stringify(uniqueMissing)}`,
+          error: `Entities not found: [${uniqueMissing.map(n => `"${n}"`).join(', ')}]`,
+          errorKo: `다음 엔티티를 찾을 수 없습니다: [${uniqueMissing.map(n => `"${n}"`).join(', ')}]`,
         };
       }
 
@@ -293,8 +293,8 @@ export class KnowledgeGraphManager {
         const uniqueMissing = [...new Set(missingEntities)];
         return {
           success: false,
-          error: `Entities not found: ${JSON.stringify(uniqueMissing)}`,
-          errorKo: `다음 엔티티를 찾을 수 없습니다: ${JSON.stringify(uniqueMissing)}`,
+          error: `Entities not found: [${uniqueMissing.map(n => `"${n}"`).join(', ')}]`,
+          errorKo: `다음 엔티티를 찾을 수 없습니다: [${uniqueMissing.map(n => `"${n}"`).join(', ')}]`,
         };
       }
 
