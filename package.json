@@ -1,0 +1,32 @@
+{
+  "name": "knowledge-graph-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for managing knowledge graphs with entities and relations",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "knowledge-graph-mcp-server": "./dist/bin/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "knowledge-graph",
+    "model-context-protocol"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "fast-check": "^3.22.0",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}
