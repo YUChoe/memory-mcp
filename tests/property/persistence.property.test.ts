@@ -73,22 +73,25 @@ const knowledgeGraphArb: fc.Arbitrary<KnowledgeGraph> = fc
 // 테스트 설정
 // ============================================================================
 
-let testDir: string;
-
-beforeEach(async () => {
-  // 임시 테스트 디렉토리 생성
-  testDir = path.join(os.tmpdir(), `kg-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+/**
+ * 고유한 테스트 디렉토리 생성
+ */
+async function createTestDir(): Promise<string> {
+  const testDir = path.join(os.tmpdir(), `kg-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
   await fs.mkdir(testDir, { recursive: true });
-});
+  return testDir;
+}
 
-afterEach(async () => {
-  // 테스트 디렉토리 정리
+/**
+ * 테스트 디렉토리 정리
+ */
+async function cleanupTestDir(testDir: string): Promise<void> {
   try {
     await fs.rm(testDir, { recursive: true, force: true });
   } catch (error) {
     // 정리 실패는 무시
   }
-});
+}
 
 // ============================================================================
 // 속성 12: 영속성 라운드 트립
@@ -96,33 +99,39 @@ afterEach(async () => {
 // ============================================================================
 
 describe('Property 12: 영속성 라운드 트립', () => {
-  it('모든 유효한 그래프 상태에 대해, 그래프를 JSON으로 직렬화한 후 역직렬화하면 동일한 그래프가 생성되어야 함', () => {
-    fc.assert(
+  it('모든 유효한 그래프 상태에 대해, 그래프를 JSON으로 직렬화한 후 역직렬화하면 동일한 그래프가 생성되어야 함', async () => {
+    await fc.assert(
       fc.asyncProperty(knowledgeGraphArb, async (graph) => {
-        const storage = new GraphStorage(testDir);
+        const testDir = await createTestDir();
 
-        // 그래프 저장
-        await storage.save(graph);
+        try {
+          const storage = new GraphStorage(testDir);
 
-        // 그래프 로드
-        const loaded = await storage.load();
+          // 그래프 저장
+          await storage.save(graph);
 
-        // 엔티티 비교
-        expect(loaded.entities.size).toBe(graph.entities.size);
+          // 그래프 로드
+          const loaded = await storage.load();
 
-        for (const [name, entity] of graph.entities) {
-          const loadedEntity = loaded.entities.get(name);
-          expect(loadedEntity).toBeDefined();
-          expect(loadedEntity?.name).toBe(entity.name);
-          expect(loadedEntity?.entityType).toBe(entity.entityType);
-          expect(loadedEntity?.observations).toEqual(entity.observations);
-        }
+          // 엔티티 비교
+          expect(loaded.entities.size).toBe(graph.entities.size);
 
-        // 관계 비교
-        expect(loaded.relations.length).toBe(graph.relations.length);
+          for (const [name, entity] of graph.entities) {
+            const loadedEntity = loaded.entities.get(name);
+            expect(loadedEntity).toBeDefined();
+            expect(loadedEntity?.name).toBe(entity.name);
+            expect(loadedEntity?.entityType).toBe(entity.entityType);
+            expect(loadedEntity?.observations).toEqual(entity.observations);
+          }
 
-        for (let i = 0; i < graph.relations.length; i++) {
-          expect(loaded.relations[i]).toEqual(graph.relations[i]);
+          // 관계 비교
+          expect(loaded.relations.length).toBe(graph.relations.length);
+
+          for (let i = 0; i < graph.relations.length; i++) {
+            expect(loaded.relations[i]).toEqual(graph.relations[i]);
+          }
+        } finally {
+          await cleanupTestDir(testDir);
         }
       }),
       { numRuns: 100 }
@@ -130,12 +139,10 @@ describe('Property 12: 영속성 라운드 트립', () => {
   });
 
   it('빈 그래프도 올바르게 저장 및 로드되어야 함', async () => {
-    // 새로운 임시 디렉토리 생성
-    const emptyTestDir = path.join(os.tmpdir(), `kg-empty-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
-    await fs.mkdir(emptyTestDir, { recursive: true });
+    const testDir = await createTestDir();
 
     try {
-      const storage = new GraphStorage(emptyTestDir);
+      const storage = new GraphStorage(testDir);
       const emptyGraph: KnowledgeGraph = {
         entities: new Map(),
         relations: [],
@@ -147,7 +154,7 @@ describe('Property 12: 영속성 라운드 트립', () => {
       expect(loaded.entities.size).toBe(0);
       expect(loaded.relations.length).toBe(0);
     } finally {
-      await fs.rm(emptyTestDir, { recursive: true, force: true });
+      await cleanupTestDir(testDir);
     }
   });
 });
