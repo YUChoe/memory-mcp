@@ -54,7 +54,21 @@ Kiro 또는 다른 MCP 클라이언트의 설정 파일에 서버를 추가합�
   "mcpServers": {
     "knowledge-graph": {
       "command": "npx",
-      "args": ["knowledge-graph-mcp-server", "/path/to/project"],
+      "args": ["knowledge-graph-mcp-server", "C:/path/to/project"],
+      "env": {}
+    }
+  }
+}
+```
+
+또는 `--storage-path` 플래그를 사용할 수도 있습니다:
+
+```json
+{
+  "mcpServers": {
+    "knowledge-graph": {
+      "command": "npx",
+      "args": ["knowledge-graph-mcp-server", "--storage-path", "C:/path/to/project"],
       "env": {}
     }
   }

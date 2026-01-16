@@ -34,6 +34,9 @@ function parseArgs(): { storagePath?: string } {
     } else if (arg === '--help' || arg === '-h') {
       printHelp();
       process.exit(0);
+    } else if (!arg.startsWith('-')) {
+      // 플래그가 아닌 경우 저장 경로로 처리 (MCP 클라이언트 호환성)
+      result.storagePath = arg;
     } else {
       console.error(`Error: Unknown argument: ${arg}`);
       console.error(`에러: 알 수 없는 인자: ${arg}`);
@@ -53,16 +56,22 @@ function printHelp(): void {
 Knowledge Graph MCP Server
 
 Usage:
+  npx knowledge-graph-mcp-server [path]
   npx knowledge-graph-mcp-server [options]
 
+Arguments:
+  path                       Storage path (project path with .kiro directory)
+                             저장 경로 (.kiro 디렉토리가 있는 프로젝트 경로)
+
 Options:
-  --storage-path, -s <path>  Specify storage path (project path with .kiro directory)
-                             저장 경로 지정 (.kiro 디렉토리가 있는 프로젝트 경로)
+  --storage-path, -s <path>  Specify storage path (same as positional argument)
+                             저장 경로 지정 (위치 인자와 동일)
   --help, -h                 Show this help message
                              도움말 표시
 
 Examples:
   npx knowledge-graph-mcp-server
+  npx knowledge-graph-mcp-server /path/to/project
   npx knowledge-graph-mcp-server --storage-path /path/to/project
   `);
 }
