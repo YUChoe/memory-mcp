@@ -13,20 +13,42 @@ import {
   KnowledgeGraph,
   Result,
 } from './types.js';
+import { GraphStorage } from './graph-storage.js';
 
 export class KnowledgeGraphManager {
   private entities: Map<string, Entity>;
   private relations: Relation[];
+  private storage: GraphStorage;
 
-  constructor() {
+  constructor(storage: GraphStorage) {
     this.entities = new Map();
     this.relations = [];
+    this.storage = storage;
+  }
+
+  /**
+   * 저장소에서 그래프 로드
+   */
+  async loadFromStorage(): Promise<void> {
+    const graph = await this.storage.load();
+    this.entities = graph.entities;
+    this.relations = graph.relations;
+  }
+
+  /**
+   * 저장소에 그래프 저장
+   */
+  private async saveToStorage(): Promise<void> {
+    await this.storage.save({
+      entities: this.entities,
+      relations: this.relations,
+    });
   }
 
   /**
    * 엔티티 생성
    */
-  createEntities(inputs: EntityInput[]): Result<Entity[]> {
+  async createEntities(inputs: EntityInput[]): Promise<Result<Entity[]>> {
     const created: Entity[] = [];
 
     for (const input of inputs) {
@@ -48,6 +70,8 @@ export class KnowledgeGraphManager {
       this.entities.set(entity.name, entity);
       created.push(entity);
     }
+
+    await this.saveToStorage();
 
     return {
       success: true,
@@ -88,7 +112,7 @@ export class KnowledgeGraphManager {
   /**
    * 엔티티 삭제
    */
-  deleteEntities(names: string[]): Result<void> {
+  async deleteEntities(names: string[]): Promise<Result<void>> {
     for (const name of names) {
       this.entities.delete(name);
       // 관련 관계 삭제
@@ -96,6 +120,8 @@ export class KnowledgeGraphManager {
         (r) => r.from !== name && r.to !== name
       );
     }
+
+    await this.saveToStorage();
 
     return {
       success: true,
@@ -106,7 +132,7 @@ export class KnowledgeGraphManager {
   /**
    * 관계 생성
    */
-  createRelations(inputs: RelationInput[]): Result<Relation[]> {
+  async createRelations(inputs: RelationInput[]): Promise<Result<Relation[]>> {
     const created: Relation[] = [];
 
     for (const input of inputs) {
@@ -136,6 +162,8 @@ export class KnowledgeGraphManager {
       created.push(relation);
     }
 
+    await this.saveToStorage();
+
     return {
       success: true,
       data: created,
@@ -145,7 +173,7 @@ export class KnowledgeGraphManager {
   /**
    * 관계 삭제
    */
-  deleteRelations(inputs: RelationInput[]): Result<void> {
+  async deleteRelations(inputs: RelationInput[]): Promise<Result<void>> {
     for (const input of inputs) {
       this.relations = this.relations.filter(
         (r) =>
@@ -157,6 +185,8 @@ export class KnowledgeGraphManager {
       );
     }
 
+    await this.saveToStorage();
+
     return {
       success: true,
       data: undefined,
@@ -166,7 +196,7 @@ export class KnowledgeGraphManager {
   /**
    * 관찰 내용 추가
    */
-  addObservations(additions: ObservationAddition[]): Result<void> {
+  async addObservations(additions: ObservationAddition[]): Promise<Result<void>> {
     for (const addition of additions) {
       const entity = this.entities.get(addition.entityName);
       if (!entity) {
@@ -180,6 +210,8 @@ export class KnowledgeGraphManager {
       entity.observations.push(...addition.contents);
     }
 
+    await this.saveToStorage();
+
     return {
       success: true,
       data: undefined,
@@ -189,7 +221,7 @@ export class KnowledgeGraphManager {
   /**
    * 관찰 내용 삭제
    */
-  deleteObservations(deletions: ObservationDeletion[]): Result<void> {
+  async deleteObservations(deletions: ObservationDeletion[]): Promise<Result<void>> {
     for (const deletion of deletions) {
       const entity = this.entities.get(deletion.entityName);
       if (!entity) {
@@ -204,6 +236,8 @@ export class KnowledgeGraphManager {
         (obs) => !deletion.observations.includes(obs)
       );
     }
+
+    await this.saveToStorage();
 
     return {
       success: true,
