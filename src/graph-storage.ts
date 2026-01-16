@@ -56,9 +56,19 @@ export class GraphStorage {
         };
       }
 
-      // JSON 파싱 오류 또는 기타 오류
+      // JSON 파싱 오류
+      if (error instanceof SyntaxError) {
+        throw new Error(
+          `Failed to parse storage file: Invalid JSON format at ${this.storagePath}\n` +
+          `저장 파일을 읽을 수 없습니다: 잘못된 JSON 형식 (${this.storagePath})`
+        );
+      }
+
+      // 기타 오류
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
       throw new Error(
-        `Failed to load graph: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to load graph from ${this.storagePath}: ${errorMsg}\n` +
+        `그래프 로드 실패 (${this.storagePath}): ${errorMsg}`
       );
     }
   }
@@ -77,8 +87,28 @@ export class GraphStorage {
 
       await fs.writeFile(this.storagePath, data, 'utf-8');
     } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+
+      // 권한 오류
+      if ((error as NodeJS.ErrnoException).code === 'EACCES') {
+        throw new Error(
+          `Permission denied: Cannot write to ${this.storagePath}\n` +
+          `권한 거부: ${this.storagePath}에 쓸 수 없습니다`
+        );
+      }
+
+      // 디스크 공간 부족
+      if ((error as NodeJS.ErrnoException).code === 'ENOSPC') {
+        throw new Error(
+          `No space left on device: Cannot save graph to ${this.storagePath}\n` +
+          `디스크 공간 부족: ${this.storagePath}에 그래프를 저장할 수 없습니다`
+        );
+      }
+
+      // 기타 오류
       throw new Error(
-        `Failed to save graph: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to save graph to ${this.storagePath}: ${errorMsg}\n` +
+        `그래프 저장 실패 (${this.storagePath}): ${errorMsg}`
       );
     }
   }

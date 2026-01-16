@@ -330,11 +330,16 @@ export class MCPServer {
           case 'open_nodes':
             return await this.handleOpenNodes(args);
           default:
-            return this.formatError(`Unknown tool: ${name}`);
+            return this.formatErrorWithKo(
+              `Unknown tool: ${name}`,
+              `알 수 없는 도구: ${name}`
+            );
         }
       } catch (error) {
-        return this.formatError(
-          `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        return this.formatErrorWithKo(
+          `Tool execution failed: ${errorMsg}`,
+          `도구 실행 실패: ${errorMsg}`
         );
       }
     });
@@ -345,20 +350,34 @@ export class MCPServer {
    */
   private async handleCreateEntities(args: unknown): Promise<CallToolResult> {
     if (!this.isValidArgs(args, ['entities'])) {
-      return this.formatError('Invalid arguments: entities array is required');
+      return this.formatErrorWithKo(
+        'Invalid arguments: entities array is required',
+        '잘못된 인자: entities 배열이 필요합니다'
+      );
     }
 
     const { entities } = args as { entities: unknown };
 
     if (!Array.isArray(entities)) {
-      return this.formatError('Invalid arguments: entities must be an array');
+      return this.formatErrorWithKo(
+        'Invalid arguments: entities must be an array',
+        '잘못된 인자: entities는 배열이어야 합니다'
+      );
+    }
+
+    if (entities.length === 0) {
+      return this.formatErrorWithKo(
+        'Invalid arguments: entities array cannot be empty',
+        '잘못된 인자: entities 배열은 비어있을 수 없습니다'
+      );
     }
 
     // 각 엔티티 검증
     for (const entity of entities) {
       if (!this.isValidEntity(entity)) {
-        return this.formatError(
-          'Invalid entity: name, entityType, and observations are required'
+        return this.formatErrorWithKo(
+          'Invalid entity: name, entityType, and observations are required',
+          '잘못된 엔티티: name, entityType, observations가 필요합니다'
         );
       }
     }
@@ -372,20 +391,34 @@ export class MCPServer {
    */
   private async handleCreateRelations(args: unknown): Promise<CallToolResult> {
     if (!this.isValidArgs(args, ['relations'])) {
-      return this.formatError('Invalid arguments: relations array is required');
+      return this.formatErrorWithKo(
+        'Invalid arguments: relations array is required',
+        '잘못된 인자: relations 배열이 필요합니다'
+      );
     }
 
     const { relations } = args as { relations: unknown };
 
     if (!Array.isArray(relations)) {
-      return this.formatError('Invalid arguments: relations must be an array');
+      return this.formatErrorWithKo(
+        'Invalid arguments: relations must be an array',
+        '잘못된 인자: relations는 배열이어야 합니다'
+      );
+    }
+
+    if (relations.length === 0) {
+      return this.formatErrorWithKo(
+        'Invalid arguments: relations array cannot be empty',
+        '잘못된 인자: relations 배열은 비어있을 수 없습니다'
+      );
     }
 
     // 각 관계 검증
     for (const relation of relations) {
       if (!this.isValidRelation(relation)) {
-        return this.formatError(
-          'Invalid relation: from, to, and relationType are required'
+        return this.formatErrorWithKo(
+          'Invalid relation: from, to, and relationType are required',
+          '잘못된 관계: from, to, relationType이 필요합니다'
         );
       }
     }
@@ -399,20 +432,34 @@ export class MCPServer {
    */
   private async handleAddObservations(args: unknown): Promise<CallToolResult> {
     if (!this.isValidArgs(args, ['observations'])) {
-      return this.formatError('Invalid arguments: observations array is required');
+      return this.formatErrorWithKo(
+        'Invalid arguments: observations array is required',
+        '잘못된 인자: observations 배열이 필요합니다'
+      );
     }
 
     const { observations } = args as { observations: unknown };
 
     if (!Array.isArray(observations)) {
-      return this.formatError('Invalid arguments: observations must be an array');
+      return this.formatErrorWithKo(
+        'Invalid arguments: observations must be an array',
+        '잘못된 인자: observations는 배열이어야 합니다'
+      );
+    }
+
+    if (observations.length === 0) {
+      return this.formatErrorWithKo(
+        'Invalid arguments: observations array cannot be empty',
+        '잘못된 인자: observations 배열은 비어있을 수 없습니다'
+      );
     }
 
     // 각 관찰 추가 검증
     for (const obs of observations) {
       if (!this.isValidObservationAddition(obs)) {
-        return this.formatError(
-          'Invalid observation: entityName and contents array are required'
+        return this.formatErrorWithKo(
+          'Invalid observation: entityName and contents array are required',
+          '잘못된 관찰: entityName과 contents 배열이 필요합니다'
         );
       }
     }
@@ -426,17 +473,33 @@ export class MCPServer {
    */
   private async handleDeleteEntities(args: unknown): Promise<CallToolResult> {
     if (!this.isValidArgs(args, ['entityNames'])) {
-      return this.formatError('Invalid arguments: entityNames array is required');
+      return this.formatErrorWithKo(
+        'Invalid arguments: entityNames array is required',
+        '잘못된 인자: entityNames 배열이 필요합니다'
+      );
     }
 
     const { entityNames } = args as { entityNames: unknown };
 
     if (!Array.isArray(entityNames)) {
-      return this.formatError('Invalid arguments: entityNames must be an array');
+      return this.formatErrorWithKo(
+        'Invalid arguments: entityNames must be an array',
+        '잘못된 인자: entityNames는 배열이어야 합니다'
+      );
+    }
+
+    if (entityNames.length === 0) {
+      return this.formatErrorWithKo(
+        'Invalid arguments: entityNames array cannot be empty',
+        '잘못된 인자: entityNames 배열은 비어있을 수 없습니다'
+      );
     }
 
     if (!entityNames.every((name) => typeof name === 'string')) {
-      return this.formatError('Invalid arguments: all entity names must be strings');
+      return this.formatErrorWithKo(
+        'Invalid arguments: all entity names must be strings',
+        '잘못된 인자: 모든 엔티티 이름은 문자열이어야 합니다'
+      );
     }
 
     const result = await this.manager.deleteEntities(entityNames);
@@ -448,20 +511,34 @@ export class MCPServer {
    */
   private async handleDeleteObservations(args: unknown): Promise<CallToolResult> {
     if (!this.isValidArgs(args, ['deletions'])) {
-      return this.formatError('Invalid arguments: deletions array is required');
+      return this.formatErrorWithKo(
+        'Invalid arguments: deletions array is required',
+        '잘못된 인자: deletions 배열이 필요합니다'
+      );
     }
 
     const { deletions } = args as { deletions: unknown };
 
     if (!Array.isArray(deletions)) {
-      return this.formatError('Invalid arguments: deletions must be an array');
+      return this.formatErrorWithKo(
+        'Invalid arguments: deletions must be an array',
+        '잘못된 인자: deletions는 배열이어야 합니다'
+      );
+    }
+
+    if (deletions.length === 0) {
+      return this.formatErrorWithKo(
+        'Invalid arguments: deletions array cannot be empty',
+        '잘못된 인자: deletions 배열은 비어있을 수 없습니다'
+      );
     }
 
     // 각 삭제 검증
     for (const deletion of deletions) {
       if (!this.isValidObservationDeletion(deletion)) {
-        return this.formatError(
-          'Invalid deletion: entityName and observations array are required'
+        return this.formatErrorWithKo(
+          'Invalid deletion: entityName and observations array are required',
+          '잘못된 삭제: entityName과 observations 배열이 필요합니다'
         );
       }
     }
@@ -475,20 +552,34 @@ export class MCPServer {
    */
   private async handleDeleteRelations(args: unknown): Promise<CallToolResult> {
     if (!this.isValidArgs(args, ['relations'])) {
-      return this.formatError('Invalid arguments: relations array is required');
+      return this.formatErrorWithKo(
+        'Invalid arguments: relations array is required',
+        '잘못된 인자: relations 배열이 필요합니다'
+      );
     }
 
     const { relations } = args as { relations: unknown };
 
     if (!Array.isArray(relations)) {
-      return this.formatError('Invalid arguments: relations must be an array');
+      return this.formatErrorWithKo(
+        'Invalid arguments: relations must be an array',
+        '잘못된 인자: relations는 배열이어야 합니다'
+      );
+    }
+
+    if (relations.length === 0) {
+      return this.formatErrorWithKo(
+        'Invalid arguments: relations array cannot be empty',
+        '잘못된 인자: relations 배열은 비어있을 수 없습니다'
+      );
     }
 
     // 각 관계 검증
     for (const relation of relations) {
       if (!this.isValidRelation(relation)) {
-        return this.formatError(
-          'Invalid relation: from, to, and relationType are required'
+        return this.formatErrorWithKo(
+          'Invalid relation: from, to, and relationType are required',
+          '잘못된 관계: from, to, relationType이 필요합니다'
         );
       }
     }
@@ -510,13 +601,26 @@ export class MCPServer {
    */
   private async handleSearchNodes(args: unknown): Promise<CallToolResult> {
     if (!this.isValidArgs(args, ['query'])) {
-      return this.formatError('Invalid arguments: query string is required');
+      return this.formatErrorWithKo(
+        'Invalid arguments: query string is required',
+        '잘못된 인자: query 문자열이 필요합니다'
+      );
     }
 
     const { query } = args as { query: unknown };
 
     if (typeof query !== 'string') {
-      return this.formatError('Invalid arguments: query must be a string');
+      return this.formatErrorWithKo(
+        'Invalid arguments: query must be a string',
+        '잘못된 인자: query는 문자열이어야 합니다'
+      );
+    }
+
+    if (query.trim().length === 0) {
+      return this.formatErrorWithKo(
+        'Invalid arguments: query cannot be empty',
+        '잘못된 인자: query는 비어있을 수 없습니다'
+      );
     }
 
     const result = this.manager.searchNodes(query);
@@ -528,17 +632,33 @@ export class MCPServer {
    */
   private async handleOpenNodes(args: unknown): Promise<CallToolResult> {
     if (!this.isValidArgs(args, ['names'])) {
-      return this.formatError('Invalid arguments: names array is required');
+      return this.formatErrorWithKo(
+        'Invalid arguments: names array is required',
+        '잘못된 인자: names 배열이 필요합니다'
+      );
     }
 
     const { names } = args as { names: unknown };
 
     if (!Array.isArray(names)) {
-      return this.formatError('Invalid arguments: names must be an array');
+      return this.formatErrorWithKo(
+        'Invalid arguments: names must be an array',
+        '잘못된 인자: names는 배열이어야 합니다'
+      );
+    }
+
+    if (names.length === 0) {
+      return this.formatErrorWithKo(
+        'Invalid arguments: names array cannot be empty',
+        '잘못된 인자: names 배열은 비어있을 수 없습니다'
+      );
     }
 
     if (!names.every((name) => typeof name === 'string')) {
-      return this.formatError('Invalid arguments: all names must be strings');
+      return this.formatErrorWithKo(
+        'Invalid arguments: all names must be strings',
+        '잘못된 인자: 모든 이름은 문자열이어야 합니다'
+      );
     }
 
     const result = this.manager.openNodes(names);
@@ -666,6 +786,21 @@ export class MCPServer {
         {
           type: 'text',
           text: message,
+        },
+      ],
+      isError: true,
+    };
+  }
+
+  /**
+   * 한국어 설명이 포함된 에러 메시지를 MCP CallToolResult 형식으로 포맷팅
+   */
+  private formatErrorWithKo(message: string, messageKo: string): CallToolResult {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `${message}\n${messageKo}`,
         },
       ],
       isError: true,

@@ -52,6 +52,15 @@ export class KnowledgeGraphManager {
     const created: Entity[] = [];
 
     for (const input of inputs) {
+      // 빈 이름 검증
+      if (!input.name || input.name.trim().length === 0) {
+        return {
+          success: false,
+          error: 'Entity name cannot be empty',
+          errorKo: '엔티티 이름은 비어있을 수 없습니다',
+        };
+      }
+
       // 중복 검사
       if (this.entities.has(input.name)) {
         return {
@@ -134,24 +143,29 @@ export class KnowledgeGraphManager {
    */
   async createRelations(inputs: RelationInput[]): Promise<Result<Relation[]>> {
     const created: Relation[] = [];
+    const missingEntities: string[] = [];
 
     for (const input of inputs) {
       // 엔티티 존재 검증
       if (!this.entities.has(input.from)) {
-        return {
-          success: false,
-          error: `Entity not found: "${input.from}"`,
-          errorKo: `엔티티를 찾을 수 없습니다: "${input.from}"`,
-        };
+        missingEntities.push(input.from);
       }
       if (!this.entities.has(input.to)) {
-        return {
-          success: false,
-          error: `Entity not found: "${input.to}"`,
-          errorKo: `엔티티를 찾을 수 없습니다: "${input.to}"`,
-        };
+        missingEntities.push(input.to);
       }
+    }
 
+    // 누락된 엔티티가 있으면 모두 나열
+    if (missingEntities.length > 0) {
+      const uniqueMissing = [...new Set(missingEntities)];
+      return {
+        success: false,
+        error: `Entities not found: ${JSON.stringify(uniqueMissing)}`,
+        errorKo: `다음 엔티티를 찾을 수 없습니다: ${JSON.stringify(uniqueMissing)}`,
+      };
+    }
+
+    for (const input of inputs) {
       const relation: Relation = {
         from: input.from,
         to: input.to,
@@ -197,16 +211,28 @@ export class KnowledgeGraphManager {
    * 관찰 내용 추가
    */
   async addObservations(additions: ObservationAddition[]): Promise<Result<void>> {
-    for (const addition of additions) {
-      const entity = this.entities.get(addition.entityName);
-      if (!entity) {
-        return {
-          success: false,
-          error: `Entity not found: "${addition.entityName}"`,
-          errorKo: `엔티티를 찾을 수 없습니다: "${addition.entityName}"`,
-        };
-      }
+    const missingEntities: string[] = [];
 
+    // 먼저 모든 엔티티 존재 확인
+    for (const addition of additions) {
+      if (!this.entities.has(addition.entityName)) {
+        missingEntities.push(addition.entityName);
+      }
+    }
+
+    // 누락된 엔티티가 있으면 모두 나열
+    if (missingEntities.length > 0) {
+      const uniqueMissing = [...new Set(missingEntities)];
+      return {
+        success: false,
+        error: `Entities not found: ${JSON.stringify(uniqueMissing)}`,
+        errorKo: `다음 엔티티를 찾을 수 없습니다: ${JSON.stringify(uniqueMissing)}`,
+      };
+    }
+
+    // 모든 엔티티가 존재하면 관찰 추가
+    for (const addition of additions) {
+      const entity = this.entities.get(addition.entityName)!;
       entity.observations.push(...addition.contents);
     }
 
@@ -222,16 +248,28 @@ export class KnowledgeGraphManager {
    * 관찰 내용 삭제
    */
   async deleteObservations(deletions: ObservationDeletion[]): Promise<Result<void>> {
-    for (const deletion of deletions) {
-      const entity = this.entities.get(deletion.entityName);
-      if (!entity) {
-        return {
-          success: false,
-          error: `Entity not found: "${deletion.entityName}"`,
-          errorKo: `엔티티를 찾을 수 없습니다: "${deletion.entityName}"`,
-        };
-      }
+    const missingEntities: string[] = [];
 
+    // 먼저 모든 엔티티 존재 확인
+    for (const deletion of deletions) {
+      if (!this.entities.has(deletion.entityName)) {
+        missingEntities.push(deletion.entityName);
+      }
+    }
+
+    // 누락된 엔티티가 있으면 모두 나열
+    if (missingEntities.length > 0) {
+      const uniqueMissing = [...new Set(missingEntities)];
+      return {
+        success: false,
+        error: `Entities not found: ${JSON.stringify(uniqueMissing)}`,
+        errorKo: `다음 엔티티를 찾을 수 없습니다: ${JSON.stringify(uniqueMissing)}`,
+      };
+    }
+
+    // 모든 엔티티가 존재하면 관찰 삭제
+    for (const deletion of deletions) {
+      const entity = this.entities.get(deletion.entityName)!;
       entity.observations = entity.observations.filter(
         (obs) => !deletion.observations.includes(obs)
       );
