@@ -107,7 +107,7 @@ TypeScript로 MCP 서버를 구현하여 지식 그래프를 관리합니다. �
     - 서버 시작 및 종료 로직
     - 요구사항: 6.1
 
-  - [ ] 8.2 MCP 도구 등록
+  - [x] 8.2 MCP 도구 등록
     - 9개 도구 등록 (create_entities, create_relations, add_observations, delete_entities, delete_observations, delete_relations, read_graph, search_nodes, open_nodes)
     - 각 도구의 스키마 정의
     - 요구사항: 6.2

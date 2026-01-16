@@ -5,6 +5,20 @@
  * npx를 통해 실행 가능
  */
 
-console.log('Knowledge Graph MCP Server starting...');
+import { MCPServer } from '../mcp-server.js';
 
-// TODO: MCP 서버 초기화 및 시작 로직 구현
+async function main() {
+  // 명령줄 인자에서 저장 경로 가져오기
+  const args = process.argv.slice(2);
+  const storagePath = args.find(arg => arg.startsWith('--path='))?.split('=')[1];
+
+  try {
+    const server = new MCPServer(storagePath);
+    await server.start();
+  } catch (error) {
+    console.error('Failed to start MCP server:', error);
+    process.exit(1);
+  }
+}
+
+main();

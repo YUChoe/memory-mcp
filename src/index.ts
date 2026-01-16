@@ -3,4 +3,6 @@
  */
 
 export * from './types.js';
-// TODO: 추가 모듈 export
+export * from './knowledge-graph-manager.js';
+export * from './graph-storage.js';
+export * from './mcp-server.js';
