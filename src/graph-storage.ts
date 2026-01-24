@@ -17,17 +17,15 @@ export class GraphStorage {
 
   /**
    * 저장 경로 결정
-   * projectPath가 제공되면 .kiro 디렉토리 사용
-   * 그렇지 않으면 홈 디렉토리 사용
+   * projectPath가 제공되면 해당 경로에 직접 저장
+   * 그렇지 않으면 홈 디렉토리에 저장
    */
   private determineStoragePath(projectPath?: string): string {
     if (projectPath) {
-      const kiroDir = path.join(projectPath, '.kiro');
-      return path.join(kiroDir, 'knowledge-graph.json');
+      return path.join(projectPath, 'knowledge-graph.json');
     } else {
       const homeDir = os.homedir();
-      const kiroDir = path.join(homeDir, '.kiro');
-      return path.join(kiroDir, 'knowledge-graph.json');
+      return path.join(homeDir, 'knowledge-graph.json');
     }
   }
 

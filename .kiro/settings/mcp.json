@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "knowledge-graph": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "git+https@github.com:YUChoe/memory-mcp.git",
+        "C:\\Users\\yonguk.choe\\src\\memory-mcp"
+      ],
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}

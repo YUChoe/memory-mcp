@@ -101,20 +101,21 @@ describe('손상된 JSON 파일 처리', () => {
 // ============================================================================
 
 describe('저장 경로 결정', () => {
-  it('프로젝트 경로가 제공되면 .kiro 디렉토리를 사용해야 함', () => {
+  it('프로젝트 경로가 제공되면 해당 경로에 직접 저장해야 함', () => {
     const projectPath = '/test/project';
     const storage = new GraphStorage(projectPath);
     const storagePath = storage.getStoragePath();
 
-    expect(storagePath).toContain('.kiro');
+    expect(storagePath).toContain('project');
     expect(storagePath).toContain('knowledge-graph.json');
+    expect(storagePath).not.toContain('.kiro');
   });
 
-  it('프로젝트 경로가 없으면 홈 디렉토리를 사용해야 함', () => {
+  it('프로젝트 경로가 없으면 홈 디렉토리에 직접 저장해야 함', () => {
     const storage = new GraphStorage();
     const storagePath = storage.getStoragePath();
 
-    expect(storagePath).toContain('.kiro');
     expect(storagePath).toContain('knowledge-graph.json');
+    expect(storagePath).not.toContain('.kiro');
   });
 });

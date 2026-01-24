@@ -29,8 +29,9 @@ Add the server to your Kiro or other MCP client configuration file:
   "mcpServers": {
     "knowledge-graph": {
       "command": "npx",
-      "args": ["knowledge-graph-mcp-server"],
-      "env": {}
+      "args": [       "-y",
+        "git+https@github.com:YUChoe/memory-mcp.git"
+      ]
     }
   }
 }
@@ -43,22 +44,10 @@ To specify a project path:
   "mcpServers": {
     "knowledge-graph": {
       "command": "npx",
-      "args": ["knowledge-graph-mcp-server", "C:/path/to/project"],
-      "env": {}
-    }
-  }
-}
-```
-
-Or use the `--storage-path` flag:
-
-```json
-{
-  "mcpServers": {
-    "knowledge-graph": {
-      "command": "npx",
-      "args": ["knowledge-graph-mcp-server", "--storage-path", "C:/path/to/project"],
-      "env": {}
+      "args": [       "-y",
+        "git+https@github.com:YUChoe/memory-mcp.git",
+        "C:\\Users\\user\\src\\projectdir"
+      ]
     }
   }
 }
@@ -66,8 +55,8 @@ Or use the `--storage-path` flag:
 
 #### Storage Location
 
-- **With project path specified**: `<project-path>/.kiro/knowledge-graph.json`
-- **Without path specified**: `~/.kiro/knowledge-graph.json` (user home directory)
+- **With project path specified**: `<project-path>/knowledge-graph.json`
+- **Without path specified**: `~/knowledge-graph.json` (user home directory)
 
 ### API Documentation
 
@@ -288,8 +277,9 @@ Kiro 또는 다른 MCP 클라이언트의 설정 파일에 서버를 추가합�
   "mcpServers": {
     "knowledge-graph": {
       "command": "npx",
-      "args": ["knowledge-graph-mcp-server"],
-      "env": {}
+      "args": [       "-y",
+        "git+https@github.com:YUChoe/memory-mcp.git"
+      ]
     }
   }
 }
@@ -302,22 +292,10 @@ Kiro 또는 다른 MCP 클라이언트의 설정 파일에 서버를 추가합�
   "mcpServers": {
     "knowledge-graph": {
       "command": "npx",
-      "args": ["knowledge-graph-mcp-server", "C:/path/to/project"],
-      "env": {}
-    }
-  }
-}
-```
-
-또는 `--storage-path` 플래그를 사용할 수도 있습니다:
-
-```json
-{
-  "mcpServers": {
-    "knowledge-graph": {
-      "command": "npx",
-      "args": ["knowledge-graph-mcp-server", "--storage-path", "C:/path/to/project"],
-      "env": {}
+      "args": [       "-y",
+        "git+https@github.com:YUChoe/memory-mcp.git",
+        "C:\\Users\\user\\src\\projectdir"
+      ]
     }
   }
 }
@@ -325,8 +303,8 @@ Kiro 또는 다른 MCP 클라이언트의 설정 파일에 서버를 추가합�
 
 #### 저장 위치
 
-- **프로젝트 경로 지정 시**: `<project-path>/.kiro/knowledge-graph.json`
-- **경로 미지정 시**: `~/.kiro/knowledge-graph.json` (사용자 홈 디렉토리)
+- **프로젝트 경로 지정 시**: `<project-path>/knowledge-graph.json`
+- **경로 미지정 시**: `~/knowledge-graph.json` (사용자 홈 디렉토리)
 
 ### API 문서
 
