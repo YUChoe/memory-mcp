@@ -67,6 +67,7 @@ export class KnowledgeGraphManager {
 
   /**
    * 엔티티 생성
+   * default_user는 upsert 방식으로 동작 (이미 존재하면 기존 엔티티 반환)
    */
   async createEntities(inputs: EntityInput[]): Promise<Result<Entity[]>> {
     return this.acquireWriteLock(async () => {
@@ -82,7 +83,14 @@ export class KnowledgeGraphManager {
           };
         }
 
-        // 중복 검사
+        // default_user는 upsert 방식
+        if (input.name === 'default_user' && this.entities.has(input.name)) {
+          const existingEntity = this.entities.get(input.name)!;
+          created.push(existingEntity);
+          continue;
+        }
+
+        // 다른 엔티티는 중복 검사
         if (this.entities.has(input.name)) {
           return {
             success: false,

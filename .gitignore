@@ -5,3 +5,4 @@ coverage/
 .DS_Store
 .env
 .kiro/storage/
+knowledge-graph.json

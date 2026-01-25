@@ -8,7 +8,10 @@
         "C:\\Users\\yonguk.choe\\src\\memory-mcp"
       ],
       "disabled": false,
-      "autoApprove": []
+      "autoApprove": [
+        "search_nodes",
+        "create_entities"
+      ]
     }
   }
 }

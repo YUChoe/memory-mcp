@@ -207,21 +207,36 @@ describe('에러 처리 속성 테스트', () => {
   /**
    * 속성 14-2: 중복 엔티티 생성 시 설명적 에러
    * **Validates: Requirements 6.4, 8.2**
+   *
+   * default_user는 upsert 방식이므로 제외
    */
   it('속성 14-2: 중복 엔티티 생성 시 설명적 에러', async () => {
     await fc.assert(
       fc.asyncProperty(
-        fc.string({ minLength: 1, maxLength: 20 }).filter(s => s.trim().length > 0),
-        fc.string({ minLength: 1, maxLength: 20 }),
+        fc.string({ minLength: 1, maxLength: 20 })
+          .filter(s => s.trim().length > 0) // 공백만 있는 문자열 제외
+          .filter(s => /^[a-zA-Z0-9_-]+$/.test(s.trim())) // 영숫자, _, - 만 허용
+          .filter(s => s.trim() !== 'default_user') // default_user 제외
+          .map(s => s.trim()), // trim된 값 사용
+        fc.string({ minLength: 1, maxLength: 20 })
+          .filter(s => s.trim().length > 0) // entityType도 공백 제외
+          .map(s => s.trim()),
         async (name, entityType) => {
+          // 각 테스트 실행마다 새로운 매니저 생성
+          const testDir = path.join(os.tmpdir(), `kg-test-${Date.now()}-${Math.random()}`);
+          await fs.mkdir(testDir, { recursive: true });
+          const testStorage = new GraphStorage(testDir);
+          const testManager = new KnowledgeGraphManager(testStorage);
+          await testManager.loadFromStorage();
+
           // 첫 번째 엔티티 생성
-          const result1 = await manager.createEntities([
+          const result1 = await testManager.createEntities([
             { name, entityType, observations: [] }
           ]);
           expect(result1.success).toBe(true);
 
           // 동일한 이름으로 두 번째 엔티티 생성 시도
-          const result2 = await manager.createEntities([
+          const result2 = await testManager.createEntities([
             { name, entityType: 'different', observations: [] }
           ]);
 
