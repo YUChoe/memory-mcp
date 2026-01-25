@@ -338,19 +338,42 @@ export class KnowledgeGraphManager {
 
   /**
    * 노드 검색
+   *
+   * 쿼리를 공백으로 토큰화하여 각 토큰에 대해 OR 검색 수행
+   * 하나 이상의 토큰이 엔티티의 이름, 타입, 또는 관찰 내용에 포함되면 매칭
+   * 빈 쿼리는 모든 엔티티를 반환
    */
   searchNodes(query: string): Result<Entity[]> {
     const lowerQuery = query.toLowerCase();
+
+    // 쿼리를 공백으로 토큰화 (빈 토큰 제거)
+    const tokens = lowerQuery.split(/\s+/).filter(token => token.length > 0);
+
+    // 토큰이 없으면 (빈 쿼리) 모든 엔티티 반환
+    if (tokens.length === 0) {
+      return {
+        success: true,
+        data: Array.from(this.entities.values()),
+      };
+    }
+
     const results: Entity[] = [];
 
     for (const entity of this.entities.values()) {
-      const matchesName = entity.name.toLowerCase().includes(lowerQuery);
-      const matchesType = entity.entityType.toLowerCase().includes(lowerQuery);
-      const matchesObservations = entity.observations.some((obs) =>
-        obs.toLowerCase().includes(lowerQuery)
-      );
+      const entityName = entity.name.toLowerCase();
+      const entityType = entity.entityType.toLowerCase();
+      const entityObservations = entity.observations.map(obs => obs.toLowerCase());
 
-      if (matchesName || matchesType || matchesObservations) {
+      // 하나 이상의 토큰이 매칭되면 결과에 포함
+      const hasMatch = tokens.some(token => {
+        const matchesName = entityName.includes(token);
+        const matchesType = entityType.includes(token);
+        const matchesObservations = entityObservations.some(obs => obs.includes(token));
+
+        return matchesName || matchesType || matchesObservations;
+      });
+
+      if (hasMatch) {
         results.push(entity);
       }
     }

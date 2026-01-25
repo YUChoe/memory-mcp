@@ -285,11 +285,16 @@ describe('통합 테스트: 전체 워크플로우', () => {
     const typeSearch = manager.searchNodes('Language');
     expect(typeSearch.data?.length).toBe(3);
 
-    // 4. 관찰 내용으로 검색
+    // 4. 관찰 내용으로 검색 (토큰 기반 OR 검색)
+    // "동적 타입"은 "동적" 또는 "타입"을 포함하는 엔티티를 모두 반환
+    // JavaScript: "동적 타입" 포함
+    // TypeScript: "정적 타입" 포함 ("타입" 토큰 매칭)
+    // Python: "동적 타입" 포함
     const obsSearch = manager.searchNodes('동적 타입');
-    expect(obsSearch.data?.length).toBe(2);
+    expect(obsSearch.data?.length).toBe(3);
 
-    const webSearch = manager.searchNodes('웹 개발');
+    // "웹"만 검색하면 "웹 개발"을 포함하는 엔티티 반환
+    const webSearch = manager.searchNodes('웹');
     expect(webSearch.data?.length).toBe(2);
 
     // 5. 일치하지 않는 검색

@@ -178,7 +178,7 @@ describe('Property 10: 그래프 읽기는 모든 데이터 반환', () => {
 // ============================================================================
 
 describe('Property 11: 검색은 일치하는 엔티티 반환', () => {
-  it('검색 결과의 모든 엔티티는 이름, 타입, 또는 관찰 내용에 쿼리 문자열을 포함해야 함', async () => {
+  it('검색 결과의 모든 엔티티는 이름, 타입, 또는 관찰 내용에 쿼리 토큰 중 하나를 포함해야 함', async () => {
     await fc.assert(
       fc.asyncProperty(
         fc.array(entityInputArb, { minLength: 1, maxLength: 10 }).chain(inputs => {
@@ -208,16 +208,24 @@ describe('Property 11: 검색은 일치하는 엔티티 반환', () => {
             }
 
             const lowerQuery = query.toLowerCase();
+            // 쿼리를 토큰으로 분리 (공백으로 분리하고 빈 토큰 제거)
+            const tokens = lowerQuery.split(/\s+/).filter(token => token.length > 0);
 
-            // 검색 결과의 모든 엔티티가 쿼리와 일치하는지 확인
+            // 검색 결과의 모든 엔티티가 최소 하나의 토큰과 일치하는지 확인
             for (const entity of searchResult.data) {
-              const matchesName = entity.name.toLowerCase().includes(lowerQuery);
-              const matchesType = entity.entityType.toLowerCase().includes(lowerQuery);
-              const matchesObservations = entity.observations.some(obs =>
-                obs.toLowerCase().includes(lowerQuery)
-              );
+              const entityName = entity.name.toLowerCase();
+              const entityType = entity.entityType.toLowerCase();
+              const entityObservations = entity.observations.map(obs => obs.toLowerCase());
 
-              expect(matchesName || matchesType || matchesObservations).toBe(true);
+              const hasMatch = tokens.some(token => {
+                const matchesName = entityName.includes(token);
+                const matchesType = entityType.includes(token);
+                const matchesObservations = entityObservations.some(obs => obs.includes(token));
+
+                return matchesName || matchesType || matchesObservations;
+              });
+
+              expect(hasMatch).toBe(true);
             }
           } finally {
             await cleanupTestDir(testDir);
