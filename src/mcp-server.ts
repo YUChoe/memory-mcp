@@ -752,11 +752,13 @@ export class MCPServer {
    */
   private formatResult<T>(result: Result<T>): CallToolResult {
     if (result.success) {
+      // data가 undefined인 경우 빈 객체로 대체 (MCP 프로토콜 요구사항)
+      const data = result.data === undefined ? {} : result.data;
       return {
         content: [
           {
             type: 'text',
-            text: JSON.stringify(result.data, this.mapReplacer, 2),
+            text: JSON.stringify(data, this.mapReplacer, 2),
           },
         ],
       };
