@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "bin": "./dist/bin/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "npx tsc",
     "test": "vitest --run",
     "test:watch": "vitest",
     "prepublishOnly": "npm run build"
