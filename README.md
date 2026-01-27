@@ -29,8 +29,9 @@ Add the server to your Kiro or other MCP client configuration file:
   "mcpServers": {
     "knowledge-graph": {
       "command": "npx",
-      "args": [       "-y",
-        "git+https@github.com:YUChoe/memory-mcp.git"
+      "args": [
+        "-y",
+        "github:YUChoe/knowledge-graph-mcp-server"
       ]
     }
   }
@@ -44,8 +45,9 @@ To specify a project path:
   "mcpServers": {
     "knowledge-graph": {
       "command": "npx",
-      "args": [       "-y",
-        "git+https@github.com:YUChoe/memory-mcp.git",
+      "args": [
+        "-y",
+        "github:YUChoe/knowledge-graph-mcp-server",
         "C:\\Users\\user\\src\\projectdir"
       ]
     }
@@ -277,8 +279,9 @@ Kiro 또는 다른 MCP 클라이언트의 설정 파일에 서버를 추가합�
   "mcpServers": {
     "knowledge-graph": {
       "command": "npx",
-      "args": [       "-y",
-        "git+https@github.com:YUChoe/memory-mcp.git"
+      "args": [
+        "-y",
+        "github:YUChoe/knowledge-graph-mcp-server"
       ]
     }
   }
@@ -292,8 +295,9 @@ Kiro 또는 다른 MCP 클라이언트의 설정 파일에 서버를 추가합�
   "mcpServers": {
     "knowledge-graph": {
       "command": "npx",
-      "args": [       "-y",
-        "git+https@github.com:YUChoe/memory-mcp.git",
+      "args": [
+        "-y",
+        "github:YUChoe/knowledge-graph-mcp-server",
         "C:\\Users\\user\\src\\projectdir"
       ]
     }
